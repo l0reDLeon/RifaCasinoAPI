@@ -34,6 +34,7 @@ namespace RifaCasinoAPI.Controllers
             return Ok("ListaDeRifas");
         }
         /*
+        [AllowAnonymous]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<GetRifaDTO>> Get(int id)
         {
@@ -45,7 +46,7 @@ namespace RifaCasinoAPI.Controllers
             }
             return mapper.Map<GetRifaDTO>(Rifa);
         }
-
+        [AllowAnonymous]
         [HttpGet("{nombre}")]
         public async Task<ActionResult<List<GetRifaDTO>>> Get([FromRoute] string nombre)
         {
@@ -61,7 +62,7 @@ namespace RifaCasinoAPI.Controllers
         */
 
         [HttpPost("NuevaRifa")]
-        [Authorize(Policy = "Admin")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> Post(RifaCreacionDTO rifaCreacionDTO)
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();

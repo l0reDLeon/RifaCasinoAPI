@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using RifaCasinoAPI.DTOs;
@@ -33,7 +35,7 @@ namespace RifaCasinoAPI.Controllers
 
             if (result.Succeeded)
             {
-                return BuildToken(credenciales);
+                return await BuildToken(credenciales);
             }
             else
             {
@@ -47,20 +49,39 @@ namespace RifaCasinoAPI.Controllers
                 credenciales.password, isPersistent: false, lockoutOnFailure:false);
             if (resultado.Succeeded)
             {
-                return BuildToken(credenciales);
+                return await BuildToken(credenciales);
             }
             else
             {
                 return BadRequest("Algo salió mal... Login Incorrecto");
             }
         }
+        [HttpGet("RenovarToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<RespuestaAutenticacion>> RenovarToken()
+        {
+            var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
+            var email = emailClaim?.Value;
 
-        private RespuestaAutenticacion BuildToken(CredencialesUsuario credenciales)
+            var credenciales = new CredencialesUsuario()
+            {
+                email = email
+            };
+            return await BuildToken(credenciales);
+        }
+        private async Task<RespuestaAutenticacion> BuildToken(CredencialesUsuario credenciales)
         {
             var claims = new List<Claim>()
             {
                 new Claim("email", credenciales.email)
             };
+
+            //Agrega los claims asignados al usuario (admin o no admin) en la tabla de Claims
+            var Usuario = await userManager.FindByEmailAsync(credenciales.email);
+            var ClaimsDB = await userManager.GetClaimsAsync(Usuario);
+            claims.AddRange(ClaimsDB);
+
+            //Pone el claim en el token
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["llavejwt"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expiracion = DateTime.UtcNow.AddMinutes(30);
@@ -73,6 +94,24 @@ namespace RifaCasinoAPI.Controllers
                 Token = new JwtSecurityTokenHandler().WriteToken(securityToken),
                 Caducidad = expiracion
             };
+        }
+        [HttpPost("HacerAdmin")]
+        public async Task<ActionResult> Admin(EditarAdminDTO editarAdminDTO)
+        {
+            var usuario = await userManager.FindByEmailAsync(editarAdminDTO.email);
+
+            await userManager.AddClaimAsync(usuario, new Claim("Admin", "True"));
+            return NoContent();
+        }
+
+        [HttpPost("QuitarAdmin")]
+        public async Task<ActionResult> QuitarAdmin(EditarAdminDTO editarAdminDTO)
+        {
+            var usuario = await userManager.FindByEmailAsync(editarAdminDTO.email);
+
+            await userManager.RemoveClaimAsync(usuario, new Claim("Admin", "True"));
+            return NoContent();
+
         }
     }
 }

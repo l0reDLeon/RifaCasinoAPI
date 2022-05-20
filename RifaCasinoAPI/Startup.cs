@@ -85,6 +85,12 @@ namespace RifaCasinoAPI
             services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
+
+            services.AddAuthorization(options =>
+            {
+                //se pueden solicitar distintos tipos de valores en require claim con una , y otro valor
+                options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("Admin"));
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup>? serviceLogger)
