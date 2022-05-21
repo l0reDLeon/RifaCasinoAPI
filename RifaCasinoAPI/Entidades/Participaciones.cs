@@ -2,9 +2,8 @@
 
 namespace RifaCasinoAPI.Entidades
 {
-    public class Participaciones
+    public class Participaciones:IValidatableObject
     {
-        [Required]
         public int id { get; set; }
         [Required]
         public int idParticipante { get; set; }
@@ -13,5 +12,16 @@ namespace RifaCasinoAPI.Entidades
         public int idRifa { get; set; }
         public int noLoteria { get; set; }
         public bool ganador { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if(noLoteria < 1 || noLoteria > 54) {
+                yield return new ValidationResult("El número de lotería fuera de rango", new string[]
+                {
+                    nameof(noLoteria)
+                });
+            }
+            throw new NotImplementedException();
+        }
     }
 }

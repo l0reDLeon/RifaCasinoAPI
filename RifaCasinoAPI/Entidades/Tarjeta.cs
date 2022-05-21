@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace RifaCasinoAPI.Entidades
+﻿namespace RifaCasinoAPI.Entidades
 {
     public class Tarjeta
     {

@@ -12,6 +12,8 @@ namespace RifaCasinoAPI.Controllers
 {
     [ApiController]
     [Route("api/Cuentas")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
     public class LoginUsuarios : ControllerBase
     {
         private readonly IConfiguration configuration;
@@ -26,12 +28,15 @@ namespace RifaCasinoAPI.Controllers
             this.userManager = userManager;
             this.signInManager = signInManager;
         }
+        [AllowAnonymous]
 
         [HttpPost("Registrar")] //api/cuentas/registrar
         public async Task<ActionResult<RespuestaAutenticacion>> Registrar(CredencialesUsuario credenciales)
         {
             var user = new IdentityUser { UserName = credenciales.email, Email = credenciales.email };
             var result = await userManager.CreateAsync(user, credenciales.password);
+            //Con esto ya tenemos el id dado a este usuario
+            var iduser = await userManager.GetUserIdAsync(user);
 
             if (result.Succeeded)
             {
@@ -42,7 +47,7 @@ namespace RifaCasinoAPI.Controllers
                 return BadRequest(result.Errors);
             }
         }
-
+        [AllowAnonymous]
         [HttpPost("Login")]
         public async Task<ActionResult<RespuestaAutenticacion>> Login(CredencialesUsuario credenciales) { 
             var resultado = await signInManager.PasswordSignInAsync(credenciales.email, 
@@ -57,7 +62,6 @@ namespace RifaCasinoAPI.Controllers
             }
         }
         [HttpGet("RenovarToken")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<RespuestaAutenticacion>> RenovarToken()
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
@@ -96,6 +100,7 @@ namespace RifaCasinoAPI.Controllers
             };
         }
         [HttpPost("HacerAdmin")]
+        //[Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult> Admin(EditarAdminDTO editarAdminDTO)
         {
             var usuario = await userManager.FindByEmailAsync(editarAdminDTO.email);
@@ -105,6 +110,7 @@ namespace RifaCasinoAPI.Controllers
         }
 
         [HttpPost("QuitarAdmin")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult> QuitarAdmin(EditarAdminDTO editarAdminDTO)
         {
             var usuario = await userManager.FindByEmailAsync(editarAdminDTO.email);

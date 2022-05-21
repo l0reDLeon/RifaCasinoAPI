@@ -4,7 +4,6 @@ namespace RifaCasinoAPI.Entidades
 {
     public class Premio
     {
-        [Required]
         public int id { get; set; }
         [Required]
         public int idRifa { get; set;}
