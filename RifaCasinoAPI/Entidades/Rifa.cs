@@ -11,7 +11,7 @@ namespace RifaCasinoAPI.Entidades
         public string nombre { get; set; }
         [Required(ErrorMessage = "El campo {1} es requerido")]
         public bool vigente { get; set; }
-        public List<Participaciones> particiones { get; set; }
+        public List<Participaciones> participaciones { get; set; }
         public List<Premio> premioList { get; set; }
     }
 }

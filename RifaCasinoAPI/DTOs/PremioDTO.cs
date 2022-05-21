@@ -1,13 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using RifaCasinoAPI.Entidades;
+using System.ComponentModel.DataAnnotations;
 
-namespace RifaCasinoAPI.Entidades
+namespace RifaCasinoAPI.DTOs
 {
-    public class Premio
+    public class PremioDTO
     {
         [Required]
-        public int id { get; set; }
-        [Required]
-        public int idRifa { get; set;}
+        public int idRifa { get; set; }
         public Rifa rifa { get; set; }
         [Required]
         public string nombre { get; set; }

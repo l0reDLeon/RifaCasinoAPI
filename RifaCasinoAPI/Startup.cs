@@ -93,7 +93,7 @@ namespace RifaCasinoAPI
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup>? serviceLogger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> serviceLogger)
             {
                 if (env.IsDevelopment())
                 {

@@ -65,6 +65,7 @@ namespace RifaCasinoAPI.Controllers
                     //}
 
                     dbContext.Add(participacion);
+                    await dbContext.SaveChangesAsync();
                 }
             }
 
@@ -90,28 +91,25 @@ namespace RifaCasinoAPI.Controllers
             await dbContext.SaveChangesAsync();
             return Ok("Participación con id " + Id + " eliminada con éxito");
         }
-
-        /*
+        
         [HttpDelete]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
-        public async Task<ActionResult> DeleteByRifaandUser(int IdRifa, int IdUsuario)
+        public async Task<ActionResult> DeleteByRifaandUser(int IdRifa, int IdUsuario, int tarjeta)
         {
-            var exist = await dbContext.Participaciones.AnyAsync(x =>  x.idRifa == IdRifa && x.idParticipante == IdUsuario);
+            var participacion = await dbContext.Participaciones.FirstOrDefaultAsync(x =>  
+                                        x.idRifa == IdRifa && x.idParticipante == IdUsuario && x.noLoteria == tarjeta);
 
-            if (!exist)
+            if (participacion == null)
             {
                 return NotFound("No existe esa participación en la lista");
             }
 
             dbContext.Remove(new Participaciones()
             {
-                idRifa = IdRifa,
-                idParticipante = IdUsuario
+                id = participacion.id
             });
             await dbContext.SaveChangesAsync();
-            return Ok("Participación del Usuario " + IdUsuario + " en la rifa " + IdRifa + " eliminada con éxito");
+            return Ok("Participación del Usuario " + IdUsuario + " en la rifa " + IdRifa + " eliminada con éxito");            
         }
-        */
-
     }
 }
