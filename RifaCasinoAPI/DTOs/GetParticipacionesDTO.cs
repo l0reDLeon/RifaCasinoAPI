@@ -3,15 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RifaCasinoAPI.DTOs
 {
-    public class ParticipacionesDTO
-    {
-        public int id { get; set; }
-        [Required]
+    public class GetParticipacionesDTO
+    {        
         public string idParticipante { get; set; }
-        public Participantes participante { get; set; }
-        [Required]
         public int idRifa { get; set; }
         public int noLoteria { get; set; }
-
+        public bool ganador { get; set; }
     }
 }

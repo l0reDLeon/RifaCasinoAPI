@@ -11,6 +11,7 @@ namespace RifaCasinoAPI.Controllers
 {
     [ApiController]
     [Route("api/Participar")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ParticipacionesController : ControllerBase
     {
         private readonly ApplicationDbContext dbContext;
@@ -27,6 +28,7 @@ namespace RifaCasinoAPI.Controllers
         }
 
         ///----------------
+        [AllowAnonymous]
         [Route("api/VerListaParticipaciones")]
         [HttpGet]
         public async Task<ActionResult<List<ParticipacionesDTO>>> GetAll()
@@ -46,29 +48,33 @@ namespace RifaCasinoAPI.Controllers
             var email = emailClaim.Value;
             var user = await userManager.FindByNameAsync(email);
 
-            var participacionDTO = mapper.Map<ParticipacionesDTO>(participacionCreacionDTO);
-            var participacion = mapper.Map<Participaciones>(participacionDTO);
-
             //--------------------------------------------
-
             //esto también está implementado como una validación del modelo
             if(participacionCreacionDTO.noLoteria < 0 || participacionCreacionDTO.noLoteria > 54) 
                 return BadRequest("Lotería fuera de rango");
 
-            var existeRifa = await dbContext.Rifas.AnyAsync(Rifa => Rifa.id == participacionCreacionDTO.idRifa);
+            var participacionDTO = mapper.Map<ParticipacionesDTO>(participacionCreacionDTO);
+            participacionDTO.idParticipante = user.Id;
+            participacionDTO.participante = await dbContext.Participantes.FirstOrDefaultAsync(
+                userParticipante => userParticipante.idUser == user.Id);
 
-            if (existeRifa)
+            var participacion = mapper.Map<Participaciones>(participacionDTO);
+
+            //var existeRifa = await dbContext.Rifas.AnyAsync(Rifa => Rifa.id == participacionCreacionDTO.idRifa);
+            var rifaDB = await dbContext.Rifas.FirstOrDefaultAsync(x => x.id == participacionCreacionDTO.idRifa);
+            if (rifaDB == null)
             {
                 
                 return BadRequest("El id de la rifa no coincide con el de ninguna en el registro");
             }
             else
             {
+                participacion.rifa = rifaDB;
                 var existeTarjeta = await dbContext.Participaciones.AnyAsync(
                         participacionRifa => participacionRifa.noLoteria == participacionCreacionDTO.noLoteria
                         && participacionRifa.idRifa == participacionCreacionDTO.idRifa
                     );
-                if (existeTarjeta) 
+                if (!existeTarjeta) 
                 {
                     
                     dbContext.Add(participacion);
@@ -83,9 +89,8 @@ namespace RifaCasinoAPI.Controllers
             return Ok("Su registro en la rifa ha sido exitoso");
         }
 
-
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id:int}")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         public async Task<ActionResult> Delete(int Id)
         {
             var exist = await dbContext.Participaciones.AnyAsync(x => x.id == Id);
@@ -102,13 +107,15 @@ namespace RifaCasinoAPI.Controllers
             await dbContext.SaveChangesAsync();
             return Ok("Participación con id " + Id + " eliminada con éxito");
         }
-        
+
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
-        public async Task<ActionResult> DeleteByRifaandUser(int IdRifa, int IdUsuario, int tarjeta)
+        //este pedo está mal pensado, piensa bien en qué valores tomas y necesitas
+        public async Task<ActionResult> DeleteByRifaandUser(int IdRifa, string IdUsuario, int tarjeta)
         {
             var participacion = await dbContext.Participaciones.FirstOrDefaultAsync(x =>  
-                                        x.idRifa == IdRifa && x.idParticipante == IdUsuario && x.noLoteria == tarjeta);
+                x.idRifa == IdRifa && x.idParticipante == IdUsuario && x.noLoteria == tarjeta);
 
             if (participacion == null)
             {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RifaCasinoAPI;
 
@@ -11,9 +12,11 @@ using RifaCasinoAPI;
 namespace RifaCasinoAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220522141637_cambiodeintastringenpropiedadIDtablaparticipaciones")]
+    partial class cambiodeintastringenpropiedadIDtablaparticipaciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,6 +231,9 @@ namespace RifaCasinoAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
+                    b.Property<int?>("Rifaid")
+                        .HasColumnType("int");
+
                     b.Property<bool>("ganador")
                         .HasColumnType("bit");
 
@@ -244,14 +250,11 @@ namespace RifaCasinoAPI.Migrations
                     b.Property<int?>("participanteid")
                         .HasColumnType("int");
 
-                    b.Property<int?>("rifaid")
-                        .HasColumnType("int");
-
                     b.HasKey("id");
 
-                    b.HasIndex("participanteid");
+                    b.HasIndex("Rifaid");
 
-                    b.HasIndex("rifaid");
+                    b.HasIndex("participanteid");
 
                     b.ToTable("Participaciones");
                 });
@@ -387,17 +390,15 @@ namespace RifaCasinoAPI.Migrations
 
             modelBuilder.Entity("RifaCasinoAPI.Entidades.Participaciones", b =>
                 {
+                    b.HasOne("RifaCasinoAPI.Entidades.Rifa", null)
+                        .WithMany("participaciones")
+                        .HasForeignKey("Rifaid");
+
                     b.HasOne("RifaCasinoAPI.Entidades.Participantes", "participante")
                         .WithMany("participacionesList")
                         .HasForeignKey("participanteid");
 
-                    b.HasOne("RifaCasinoAPI.Entidades.Rifa", "rifa")
-                        .WithMany("participaciones")
-                        .HasForeignKey("rifaid");
-
                     b.Navigation("participante");
-
-                    b.Navigation("rifa");
                 });
 
             modelBuilder.Entity("RifaCasinoAPI.Entidades.Participantes", b =>

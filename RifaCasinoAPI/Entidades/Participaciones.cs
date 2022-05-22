@@ -6,10 +6,11 @@ namespace RifaCasinoAPI.Entidades
     {
         public int id { get; set; }
         [Required]
-        public int idParticipante { get; set; }
+        public string idParticipante { get; set; }
         public Participantes participante { get; set; }
         [Required]
         public int idRifa { get; set; }
+        public Rifa rifa { get; set; }
         public int noLoteria { get; set; }
         public bool ganador { get; set; }
 

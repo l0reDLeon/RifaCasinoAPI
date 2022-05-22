@@ -8,7 +8,7 @@ namespace RifaCasinoAPI.DTOs
         public int id { get; set; }
         public string nombre { get; set; }
         public bool vigente { get; set; }
-        public List<Participaciones> participaciones { get; set; }
+        public List<GetParticipacionesDTO> participaciones { get; set; }
         public List<GetPremioDTO> premioList { get; set; }
     }
 }
