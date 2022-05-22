@@ -19,18 +19,18 @@ namespace RifaCasinoAPI.Controllers
     public class LoginUsuarios : ControllerBase
     {
         private readonly ApplicationDbContext dbContext;
-        //private readonly IConfiguration configuration; //IConfiguration config, <-esto va en el constructor si se llega a necesitar
+        private readonly IConfiguration configuration;
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly IMapper mapper;
         private readonly ILogger<LoginUsuarios> logger;
 
         public LoginUsuarios(
-            UserManager<IdentityUser> userManager, IMapper mapper, ILogger<LoginUsuarios> logger,
+            UserManager<IdentityUser> userManager, IMapper mapper, ILogger<LoginUsuarios> logger, IConfiguration config,
             SignInManager<IdentityUser> signInManager, ApplicationDbContext dbContext
         ){
             this.dbContext = dbContext;
-            //this.configuration = config;
+            this.configuration = config;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.mapper = mapper;
@@ -44,7 +44,7 @@ namespace RifaCasinoAPI.Controllers
             var user = new IdentityUser { UserName = credenciales.email, Email = credenciales.email };
             var result = await userManager.CreateAsync(user, credenciales.password);
             //Con esto ya tenemos el id dado a este usuario
-            var iduser = await userManager.GetUserIdAsync(user);
+            //var iduser = await userManager.GetUserIdAsync(user);
 
             if (result.Succeeded)
             {
@@ -106,7 +106,7 @@ namespace RifaCasinoAPI.Controllers
             //Pone el claim en el token
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["llavejwt"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiracion = DateTime.UtcNow.AddMinutes(30);
+            var expiracion = DateTime.UtcNow.AddYears(1);
 
             var securityToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims,
                 expires: expiracion, signingCredentials: creds);

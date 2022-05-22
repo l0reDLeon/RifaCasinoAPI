@@ -12,8 +12,8 @@ using RifaCasinoAPI;
 namespace RifaCasinoAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220520202918_Login")]
-    partial class Login
+    [Migration("20220522065737_NuevaBD")]
+    partial class NuevaBD
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,9 +240,6 @@ namespace RifaCasinoAPI.Migrations
                     b.Property<int>("idParticipante")
                         .HasColumnType("int");
 
-                    b.Property<int>("idPremio")
-                        .HasColumnType("int");
-
                     b.Property<int>("idRifa")
                         .HasColumnType("int");
 
@@ -272,10 +269,15 @@ namespace RifaCasinoAPI.Migrations
                     b.Property<string>("email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("password")
+                    b.Property<string>("idUser")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("userId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("id");
+
+                    b.HasIndex("userId");
 
                     b.ToTable("Participantes");
                 });
@@ -289,13 +291,19 @@ namespace RifaCasinoAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
                     b.Property<string>("descripcion")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
 
                     b.Property<bool>("disponible")
                         .HasColumnType("bit");
 
                     b.Property<int>("idRifa")
                         .HasColumnType("int");
+
+                    b.Property<string>("nombre")
+                        .IsRequired()
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
 
                     b.Property<int?>("rifaid")
                         .HasColumnType("int");
@@ -382,7 +390,7 @@ namespace RifaCasinoAPI.Migrations
             modelBuilder.Entity("RifaCasinoAPI.Entidades.Participaciones", b =>
                 {
                     b.HasOne("RifaCasinoAPI.Entidades.Rifa", null)
-                        .WithMany("particiones")
+                        .WithMany("participaciones")
                         .HasForeignKey("Rifaid");
 
                     b.HasOne("RifaCasinoAPI.Entidades.Participantes", "participante")
@@ -390,6 +398,15 @@ namespace RifaCasinoAPI.Migrations
                         .HasForeignKey("participanteid");
 
                     b.Navigation("participante");
+                });
+
+            modelBuilder.Entity("RifaCasinoAPI.Entidades.Participantes", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "user")
+                        .WithMany()
+                        .HasForeignKey("userId");
+
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("RifaCasinoAPI.Entidades.Premio", b =>
@@ -408,7 +425,7 @@ namespace RifaCasinoAPI.Migrations
 
             modelBuilder.Entity("RifaCasinoAPI.Entidades.Rifa", b =>
                 {
-                    b.Navigation("particiones");
+                    b.Navigation("participaciones");
 
                     b.Navigation("premioList");
                 });

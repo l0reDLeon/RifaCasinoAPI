@@ -85,3 +85,4 @@ C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\Microso
 C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\Newtonsoft.Json.dll
 C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\RifaCasinoAPI.staticwebassets.runtime.json

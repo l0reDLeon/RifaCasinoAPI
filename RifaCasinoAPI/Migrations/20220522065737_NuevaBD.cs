@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RifaCasinoAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Login : Migration
+    public partial class NuevaBD : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,20 +48,6 @@ namespace RifaCasinoAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Participantes",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    password = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Participantes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -185,6 +171,48 @@ namespace RifaCasinoAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Participantes",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    idUser = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    userId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Participantes", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Participantes_AspNetUsers_userId",
+                        column: x => x.userId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Premios",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    idRifa = table.Column<int>(type: "int", nullable: false),
+                    rifaid = table.Column<int>(type: "int", nullable: true),
+                    nombre = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: false),
+                    descripcion = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: true),
+                    disponible = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Premios", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Premios_Rifas_rifaid",
+                        column: x => x.rifaid,
+                        principalTable: "Rifas",
+                        principalColumn: "id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Participaciones",
                 columns: table => new
                 {
@@ -194,7 +222,6 @@ namespace RifaCasinoAPI.Migrations
                     participanteid = table.Column<int>(type: "int", nullable: true),
                     idRifa = table.Column<int>(type: "int", nullable: false),
                     noLoteria = table.Column<int>(type: "int", nullable: false),
-                    idPremio = table.Column<int>(type: "int", nullable: false),
                     ganador = table.Column<bool>(type: "bit", nullable: false),
                     Rifaid = table.Column<int>(type: "int", nullable: true)
                 },
@@ -209,27 +236,6 @@ namespace RifaCasinoAPI.Migrations
                     table.ForeignKey(
                         name: "FK_Participaciones_Rifas_Rifaid",
                         column: x => x.Rifaid,
-                        principalTable: "Rifas",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Premios",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    idRifa = table.Column<int>(type: "int", nullable: false),
-                    rifaid = table.Column<int>(type: "int", nullable: true),
-                    descripcion = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    disponible = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Premios", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_Premios_Rifas_rifaid",
-                        column: x => x.rifaid,
                         principalTable: "Rifas",
                         principalColumn: "id");
                 });
@@ -284,6 +290,11 @@ namespace RifaCasinoAPI.Migrations
                 column: "Rifaid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Participantes_userId",
+                table: "Participantes",
+                column: "userId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Premios_rifaid",
                 table: "Premios",
                 column: "rifaid");
@@ -317,13 +328,13 @@ namespace RifaCasinoAPI.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "Participantes");
 
             migrationBuilder.DropTable(
                 name: "Rifas");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

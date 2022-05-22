@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "+kFFRvYyIZWq988COStIDuipFu8hLUXvr0CcXtlFjUM=",
+  "Hash": "IZgIYOZ8C/u3GAKDfjQBJbBRG2DCLPX84aj5YD8e8Xs=",
   "Source": "RifaCasinoAPI",
   "BasePath": "_content/RifaCasinoAPI",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "RifaCasinoAPI\\wwwroot",
+      "Source": "RifaCasinoAPI",
+      "ContentRoot": "C:\\Users\\anton\\source\\repos\\RifaCasinoAPI\\RifaCasinoAPI\\wwwroot\\",
+      "BasePath": "_content/RifaCasinoAPI",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }

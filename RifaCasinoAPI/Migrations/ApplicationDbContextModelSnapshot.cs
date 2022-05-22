@@ -237,9 +237,6 @@ namespace RifaCasinoAPI.Migrations
                     b.Property<int>("idParticipante")
                         .HasColumnType("int");
 
-                    b.Property<int>("idPremio")
-                        .HasColumnType("int");
-
                     b.Property<int>("idRifa")
                         .HasColumnType("int");
 
@@ -269,10 +266,15 @@ namespace RifaCasinoAPI.Migrations
                     b.Property<string>("email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("password")
+                    b.Property<string>("idUser")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("userId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("id");
+
+                    b.HasIndex("userId");
 
                     b.ToTable("Participantes");
                 });
@@ -286,7 +288,8 @@ namespace RifaCasinoAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
                     b.Property<string>("descripcion")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
 
                     b.Property<bool>("disponible")
                         .HasColumnType("bit");
@@ -296,7 +299,8 @@ namespace RifaCasinoAPI.Migrations
 
                     b.Property<string>("nombre")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)");
 
                     b.Property<int?>("rifaid")
                         .HasColumnType("int");
@@ -391,6 +395,15 @@ namespace RifaCasinoAPI.Migrations
                         .HasForeignKey("participanteid");
 
                     b.Navigation("participante");
+                });
+
+            modelBuilder.Entity("RifaCasinoAPI.Entidades.Participantes", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "user")
+                        .WithMany()
+                        .HasForeignKey("userId");
+
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("RifaCasinoAPI.Entidades.Premio", b =>
