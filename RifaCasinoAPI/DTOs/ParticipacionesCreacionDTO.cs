@@ -5,11 +5,10 @@ namespace RifaCasinoAPI.DTOs
 {
     public class ParticipacionesCreacionDTO
     {
-        [Required]
-        public int idParticipante { get; set; }
 
         [Required]
         public int idRifa { get; set; }
+        [Required]
         public int noLoteria { get; set; }
     }
 }

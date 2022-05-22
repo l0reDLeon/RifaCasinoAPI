@@ -35,41 +35,52 @@ namespace RifaCasinoAPI.Controllers
             return mapper.Map<List<ParticipacionesDTO>>(lista);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Post(int id, ParticipacionesCreacionDTO participacionCreacionDTO)
+        [HttpPost("RegistrarUnaTarjeta")]
+        public async Task<ActionResult> Post(ParticipacionesCreacionDTO participacionCreacionDTO)
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
+            if (emailClaim == null)
+            {
+                return Unauthorized("Se necesita un usuario para poder participar en la rifa, por favor inicie sesión");
+            }
             var email = emailClaim.Value;
-
             var user = await userManager.FindByNameAsync(email);
+
             var participacionDTO = mapper.Map<ParticipacionesDTO>(participacionCreacionDTO);
             var participacion = mapper.Map<Participaciones>(participacionDTO);
 
             //--------------------------------------------
 
-            var existeTarjeta = await dbContext.Participaciones.AnyAsync(participacionRifa => participacionRifa.noLoteria == participacionCreacionDTO.noLoteria);
+            //esto también está implementado como una validación del modelo
+            if(participacionCreacionDTO.noLoteria < 0 || participacionCreacionDTO.noLoteria > 54) 
+                return BadRequest("Lotería fuera de rango");
 
-            if (existeTarjeta)
+            var existeRifa = await dbContext.Rifas.AnyAsync(Rifa => Rifa.id == participacionCreacionDTO.idRifa);
+
+            if (existeRifa)
             {
-                return BadRequest("Ya ese número de tarjeta ya está en uso.");
+                
+                return BadRequest("El id de la rifa no coincide con el de ninguna en el registro");
             }
             else
             {
-                var existeRifa = await dbContext.Rifas.AnyAsync(Rifa => Rifa.id == participacionCreacionDTO.idRifa);
-
-                if (existeRifa)
+                var existeTarjeta = await dbContext.Participaciones.AnyAsync(
+                        participacionRifa => participacionRifa.noLoteria == participacionCreacionDTO.noLoteria
+                        && participacionRifa.idRifa == participacionCreacionDTO.idRifa
+                    );
+                if (existeTarjeta) 
                 {
-                    //if (user!=null)
-                    //{
-                    //  dbContext.Add(participacion);
-                    //}
-
+                    
                     dbContext.Add(participacion);
                     await dbContext.SaveChangesAsync();
                 }
+                else
+                {
+                    return BadRequest("Ese número de tarjeta ya está en uso.");
+                }
             }
 
-            return Ok("Nueva Rifa agregada con éxito");
+            return Ok("Su registro en la rifa ha sido exitoso");
         }
 
 

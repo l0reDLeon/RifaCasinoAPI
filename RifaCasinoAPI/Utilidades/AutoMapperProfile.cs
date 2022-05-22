@@ -21,7 +21,10 @@ namespace RifaCasinoAPI.Utilidades
                                                                  //todavía no se puede llenar así que se deja para otro endpoint
             CreateMap<RifaCreacionDTO, RifaDTO>();
             CreateMap<RifaDTO, Rifa>();
-            CreateMap<Rifa, GetRifaDTO>();
+                
+            CreateMap<Rifa, GetRifaDTO>().ForMember(getrifaDTO => getrifaDTO.premioList,
+                    opciones => opciones.MapFrom(RifaTOGetRifaDTO)); 
+
             CreateMap<Rifa, PatchRifaDTO>().ReverseMap();
 
             CreateMap<PremioCreacionDTO, PremioDTO>();
@@ -29,7 +32,34 @@ namespace RifaCasinoAPI.Utilidades
         }
         //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvcmVAZ21haWwuY29tIiwiQWRtaW4iOiJUcnVlIiwiZXhwIjoxNjg0NzQ1OTM3fQ.L4pfzQjZ8HqeQYNHC-9Wp9cag4kUl6W6aC2Qqh8IHdw
         ////MAPEOS RIFA CONTROLLER////MAPEOS RIFA CONTROLLER////MAPEOS RIFA CONTROLLER////MAPEOS RIFA CONTROLLER
-        //POST RIFA-----------------------------------------------------------------
+        //GET RIFA-----------------------------------------------------------------
+        private List<GetPremioDTO> RifaTOGetRifaDTO(Rifa rifa, GetRifaDTO getRifaDTO)
+        {
+            var ListaGetPDTO = new List<GetPremioDTO>();
+
+            foreach (Premio premio in rifa.premioList)
+            {
+                // se intenta mapear de premio eventualmente a GetPremioDTO
+                var premioDTO = premioToGetPremioDTO(premio);
+                ListaGetPDTO.Add(premioDTO);
+            }
+            
+            return ListaGetPDTO;
+        }
+
+        //funcion que regresa todo el objeto, no solo una propiedad
+        private GetPremioDTO premioToGetPremioDTO(Premio premio)
+        {
+            var getPremioDTO = new GetPremioDTO();
+            getPremioDTO.descripcion = premio.descripcion;
+            getPremioDTO.nombre = premio.nombre;
+            getPremioDTO.disponible = premio.disponible;
+
+            return getPremioDTO;
+        }
+        ////MAPEOS PARTICIPACIONES CONTROLLER////MAPEOS PARTICIPACIONES CONTROLLER////MAPEOS PARTICIPACIONES CONTROLLER
+        //POST PARTICIPACION
+
 
     }
 }
