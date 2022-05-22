@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using RifaCasinoAPI.DTOs;
+using RifaCasinoAPI.Entidades;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -16,17 +18,23 @@ namespace RifaCasinoAPI.Controllers
 
     public class LoginUsuarios : ControllerBase
     {
-        private readonly IConfiguration configuration;
+        private readonly ApplicationDbContext dbContext;
+        //private readonly IConfiguration configuration; //IConfiguration config, <-esto va en el constructor si se llega a necesitar
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IMapper mapper;
+        private readonly ILogger<LoginUsuarios> logger;
 
         public LoginUsuarios(
-            UserManager<IdentityUser> userManager, IConfiguration config, 
-            SignInManager<IdentityUser> signInManager
+            UserManager<IdentityUser> userManager, IMapper mapper, ILogger<LoginUsuarios> logger,
+            SignInManager<IdentityUser> signInManager, ApplicationDbContext dbContext
         ){
-            this.configuration = config;
+            this.dbContext = dbContext;
+            //this.configuration = config;
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.mapper = mapper;
+            this.logger = logger;
         }
         [AllowAnonymous]
 
@@ -40,7 +48,17 @@ namespace RifaCasinoAPI.Controllers
 
             if (result.Succeeded)
             {
-                return await BuildToken(credenciales);
+                var token = await BuildToken(credenciales);
+
+                //mapeamos el usuario a participante DTO y luego a participante
+                var participanteDTO = mapper.Map<ParticipanteCreacionDTO>(user);
+                var participanteMapeado = mapper.Map<Participantes>(participanteDTO);
+                dbContext.Add(participanteMapeado);
+                await dbContext.SaveChangesAsync();
+
+                logger.LogInformation("INFO: Se ha creado un nuevo usuario y se ha guardado en la base de datos ");
+
+                return token;
             }
             else
             {
@@ -101,11 +119,13 @@ namespace RifaCasinoAPI.Controllers
         }
         [HttpPost("HacerAdmin")]
         //[Authorize(Policy = "AdminPolicy")]
-        public async Task<ActionResult> Admin(EditarAdminDTO editarAdminDTO)
+        public async Task<ActionResult> Admin(EditarAdminDTO editarAdminDTO)    
         {
             var usuario = await userManager.FindByEmailAsync(editarAdminDTO.email);
 
             await userManager.AddClaimAsync(usuario, new Claim("Admin", "True"));
+            logger.LogWarning("INFO: Se ha cambiado el tipo de usuario de un usuario");
+
             return NoContent();
         }
 

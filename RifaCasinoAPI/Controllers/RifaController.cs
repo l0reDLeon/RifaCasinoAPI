@@ -32,10 +32,12 @@ namespace RifaCasinoAPI.Controllers
         [HttpGet("GetDePrueba")]
         public IActionResult Get()
         {
-            return Ok("ListaDeRifas");
+            throw new NotImplementedException();
+            //return Ok("ListaDeRifas");
         }
 
         [HttpGet("VerRifas")]
+        [ResponseCache(Duration = 30)]
         public async Task<ActionResult<List<GetRifaDTO>>> GetLista()
         {
             var Rifas = await dbContext.Rifas.ToListAsync();
@@ -60,6 +62,7 @@ namespace RifaCasinoAPI.Controllers
         }
         [AllowAnonymous]
         [HttpGet("{Buscar por nombre}")]
+        [ResponseCache(Duration = 120)]
         public async Task<ActionResult<List<GetRifaDTO>>> GetByNombre([FromRoute] string nombre)
         {
             var Rifas = await dbContext.Rifas.Where(RifasBD => RifasBD.nombre.Contains(nombre)).ToListAsync();

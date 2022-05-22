@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RifaCasinoAPI.Filtros;
+using RifaCasinoAPI.Servicios;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -20,8 +22,9 @@ namespace RifaCasinoAPI
 
             public void ConfigureServices(IServiceCollection services)
             {
-                services.AddControllers().AddJsonOptions
-                (x =>
+                services.AddControllers(
+                    opciones => opciones.Filters.Add(typeof(FiltroGlobalDeExcepcion))
+                    ).AddJsonOptions(x =>
                      x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
                 );
 
@@ -81,6 +84,9 @@ namespace RifaCasinoAPI
                     };
                 });
 
+            services.AddResponseCaching();
+            services.AddTransient<FiltroGlobalDeExcepcion>();
+            
             services.AddAutoMapper(typeof(Startup));
             services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -94,22 +100,23 @@ namespace RifaCasinoAPI
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> serviceLogger)
+        {
+            if (env.IsDevelopment())
             {
-                if (env.IsDevelopment())
-                {
-                    app.UseSwagger();
-                    app.UseSwaggerUI();
-                }
+                app.UseSwagger();
+                app.UseSwaggerUI();
+             }
 
-                app.UseHttpsRedirection();
-                app.UseRouting();
-                app.UseAuthentication();
-                app.UseAuthorization();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
+             app.UseHttpsRedirection();
+             app.UseRouting();
+             app.UseResponseCaching();
+             app.UseAuthentication();
+             app.UseAuthorization();
+             app.UseEndpoints(endpoints =>
+             {
+                 endpoints.MapControllers();
+             });
 
-            }
         }
     }
+}
