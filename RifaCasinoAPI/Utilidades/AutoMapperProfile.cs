@@ -11,38 +11,25 @@ namespace RifaCasinoAPI.Utilidades
         {
             CreateMap<IdentityUser, ParticipanteCreacionDTO > ()
                 .ForMember(dto => dto.email, 
-                    opciones => opciones.MapFrom(emailUserTOstring))
+                    opciones => opciones.MapFrom(identityUser => identityUser.Email))
                 .ForMember(dto => dto.idUser, 
-                    opciones => opciones.MapFrom(idUserTOstring))
+                    opciones => opciones.MapFrom(identityUser => identityUser.Id))
                 .ForMember(dto => dto.user,
-                    opciones => opciones.MapFrom(UserTOUser));
+                    opciones => opciones.MapFrom(identityUser => identityUser));
 
             CreateMap<ParticipanteCreacionDTO, Participantes>(); //lo que no se mapea es la lista de participaciones,
                                                                  //todavía no se puede llenar así que se deja para otro endpoint
-            CreateMap<ParticipanteCreacionDTO, Participantes>();
-        }
-        ////MAPEOS LOGIN USUARIOS////MAPEOS LOGIN USUARIOS////MAPEOS LOGIN USUARIOS////MAPEOS LOGIN USUARIOS
-        //-----------------------------------------------------------------
-        //Mapear desde IdentityUser a ParticipanteCreacionDTO
-        private string emailUserTOstring(
-            IdentityUser identityUser, ParticipanteCreacionDTO participanteCreacionDTO)
-        { 
-            return identityUser.Email;
-        }
-        private string idUserTOstring(
-            IdentityUser identityUser, ParticipanteCreacionDTO participanteCreacionDTO)
-        {
+            CreateMap<RifaCreacionDTO, RifaDTO>();
+            CreateMap<RifaDTO, Rifa>();
+            CreateMap<Rifa, GetRifaDTO>();
+            CreateMap<Rifa, PatchRifaDTO>().ReverseMap();
 
-            return identityUser.Id;
+            CreateMap<PremioCreacionDTO, PremioDTO>();
+            CreateMap<PremioDTO, Premio>();
         }
-        private IdentityUser UserTOUser(
-            IdentityUser identityUser, ParticipanteCreacionDTO participanteCreacionDTO)
-        {
-            return identityUser;
-        }
-        //-----------------------------------------------------------------
-
+        //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImxvcmVAZ21haWwuY29tIiwiQWRtaW4iOiJUcnVlIiwiZXhwIjoxNjg0NzQ1OTM3fQ.L4pfzQjZ8HqeQYNHC-9Wp9cag4kUl6W6aC2Qqh8IHdw
         ////MAPEOS RIFA CONTROLLER////MAPEOS RIFA CONTROLLER////MAPEOS RIFA CONTROLLER////MAPEOS RIFA CONTROLLER
+        //POST RIFA-----------------------------------------------------------------
 
     }
 }

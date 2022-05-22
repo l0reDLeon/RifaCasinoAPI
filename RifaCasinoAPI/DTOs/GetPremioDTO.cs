@@ -1,9 +1,9 @@
 ﻿namespace RifaCasinoAPI.DTOs
 {
-    public class PremioCreacionDTO
+    public class GetPremioDTO
     {
-        public int idRifa { get; set; }
         public string nombre { get; set; }
         public string descripcion { get; set; }
+        public bool disponible { get; set; }
     }
 }

@@ -9,8 +9,6 @@ namespace RifaCasinoAPI.DTOs
         [StringLength(maximumLength: 100, ErrorMessage = "El campo {0} solo puede tener hasta 100 caracteres.")]
         [PrimeraLetraMayuscula]
         public string nombre { get; set; }
-        [Required(ErrorMessage = "El campo {1} es requerido")]
-        public bool vigente { get; set; }
 
     }
 }

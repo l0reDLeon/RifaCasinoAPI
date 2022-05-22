@@ -35,12 +35,15 @@ namespace RifaCasinoAPI.Controllers
             throw new NotImplementedException();
             //return Ok("ListaDeRifas");
         }
-
+        [AllowAnonymous]
         [HttpGet("VerRifas")]
-        [ResponseCache(Duration = 30)]
+        //[ResponseCache(Duration = 30)]
         public async Task<ActionResult<List<GetRifaDTO>>> GetLista()
         {
-            var Rifas = await dbContext.Rifas.ToListAsync();
+            var Rifas = await dbContext.Rifas
+                .Include(rifa => rifa.premioList)
+                .Include(rifa => rifa.participaciones)
+                .ToListAsync();
             if (Rifas.Count == 0)
             {
                 return NotFound();
@@ -61,9 +64,9 @@ namespace RifaCasinoAPI.Controllers
             return mapper.Map<GetRifaDTO>(Rifa);
         }
         [AllowAnonymous]
-        [HttpGet("{Buscar por nombre}")]
+        [HttpGet("Buscar por nombre")]
         [ResponseCache(Duration = 120)]
-        public async Task<ActionResult<List<GetRifaDTO>>> GetByNombre([FromRoute] string nombre)
+        public async Task<ActionResult<List<GetRifaDTO>>> GetByNombre(string nombre)
         {
             var Rifas = await dbContext.Rifas.Where(RifasBD => RifasBD.nombre.Contains(nombre)).ToListAsync();
 
@@ -115,14 +118,16 @@ namespace RifaCasinoAPI.Controllers
         }
 
         //Checar que agregue los premios, no que los reemplace -- al parecer se hace automaticament
-        [HttpPost(Name = "AgregarPremio")]
+        [HttpPost("AgregarPremio")]
         [Authorize(Policy = "AdminPolicy")]
         public async Task<IActionResult> PostPremio(PremioCreacionDTO crearPremioDTO)
         {
             var idRifa = crearPremioDTO.idRifa;
 
             if (crearPremioDTO == null) return BadRequest();
-            var rifaDB = await dbContext.Rifas.FirstOrDefaultAsync(x => x.id == idRifa);
+            var rifaDB = await dbContext.Rifas
+                .Include(rifa=>rifa.premioList)
+                .FirstOrDefaultAsync(x => x.id == idRifa);
             if (rifaDB == null) return NotFound("No existe esa rifa");
 
             var premioDTO = mapper.Map<PremioDTO>(crearPremioDTO);
@@ -131,6 +136,8 @@ namespace RifaCasinoAPI.Controllers
             if (!isOk) return BadRequest();
 
             var premio = mapper.Map<Premio>(premioDTO);
+            premio.disponible = true;
+            premio.rifa = rifaDB;
 
             var banderabanderademexico = true;
             if (rifaDB.premioList.Count == 0)

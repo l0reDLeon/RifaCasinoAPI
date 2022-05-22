@@ -16,7 +16,7 @@ namespace RifaCasinoAPI.Utilidades
             new Tarjeta(9,"ElBarril","El barril es quintaleño, el barril del mezcal."),
             new Tarjeta(10,"ElÁrbol","El árbol de la esperanza que de venir no se cansa."),
             new Tarjeta(11,"ElMelón","El melón y sus olores, un pedazo me has de dar."),
-            new Tarjeta(12,"ElValite","’Tate quieto, Valentín, no te vayas a pelear."),
+            new Tarjeta(12,"ElValiente","’Tate quieto, Valentín, no te vayas a pelear."),
             new Tarjeta(13,"ElGorrito","El gorrito ponle al nene, no se te vaya a resfriar."),
             new Tarjeta(14,"LaMuerte","La muerte siriquiflaca, montada en su burra flaca."),
             new Tarjeta(15,"LaPera","Me esperas donde quedamos, para poder platicar."),

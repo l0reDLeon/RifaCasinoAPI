@@ -15,7 +15,6 @@ namespace RifaCasinoAPI.Controllers
     [ApiController]
     [Route("api/Cuentas")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-
     public class LoginUsuarios : ControllerBase
     {
         private readonly ApplicationDbContext dbContext;
@@ -53,6 +52,7 @@ namespace RifaCasinoAPI.Controllers
                 //mapeamos el usuario a participante DTO y luego a participante
                 var participanteDTO = mapper.Map<ParticipanteCreacionDTO>(user);
                 var participanteMapeado = mapper.Map<Participantes>(participanteDTO);
+                
                 dbContext.Add(participanteMapeado);
                 await dbContext.SaveChangesAsync();
 
@@ -83,7 +83,7 @@ namespace RifaCasinoAPI.Controllers
         public async Task<ActionResult<RespuestaAutenticacion>> RenovarToken()
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
-            var email = emailClaim?.Value;
+            var email = emailClaim.Value;
 
             var credenciales = new CredencialesUsuario()
             {
@@ -124,7 +124,7 @@ namespace RifaCasinoAPI.Controllers
             var usuario = await userManager.FindByEmailAsync(editarAdminDTO.email);
 
             await userManager.AddClaimAsync(usuario, new Claim("Admin", "True"));
-            logger.LogWarning("INFO: Se ha cambiado el tipo de usuario de un usuario");
+            //logger.LogWarning("INFO: Se ha cambiado el tipo de usuario de un usuario");
 
             return NoContent();
         }
