@@ -2,8 +2,15 @@
 
 namespace RifaCasinoAPI.Utilidades
 {
-    public class NumerosRifaPreset
+    public class TarjetasPreset
     {
+        public TarjetasPreset() { }
+
+        public List<Tarjeta> GetTarjetas()
+        {
+            return this.tarjetas;
+        }
+
         public List<Tarjeta> tarjetas = new List<Tarjeta> {
             new Tarjeta(1,"ElGallo","El que cantó a San Pedro, no volverá a cantar."),
             new Tarjeta(2,"ElDiablo","El diablo son las mujeres, cuando se quieren casar."),

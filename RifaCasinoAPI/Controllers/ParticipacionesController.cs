@@ -31,10 +31,11 @@ namespace RifaCasinoAPI.Controllers
         [AllowAnonymous]
         [Route("api/VerListaParticipaciones")]
         [HttpGet]
-        public async Task<ActionResult<List<ParticipacionesDTO>>> GetAll()
+        public async Task<ActionResult<List<GetParticipacionesDTO>>> GetAll()
         {
-            var lista = await dbContext.Participaciones.ToListAsync();
-            return mapper.Map<List<ParticipacionesDTO>>(lista);
+            var lista = await dbContext.Participaciones
+                .Include(participacion => participacion.participante).ToListAsync();
+            return mapper.Map<List<GetParticipacionesDTO>>(lista);
         }
 
         [HttpPost("RegistrarUnaTarjeta")]
@@ -89,26 +90,21 @@ namespace RifaCasinoAPI.Controllers
             return Ok("Su registro en la rifa ha sido exitoso");
         }
 
-        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> Delete(int Id)
+        [Authorize(Policy = "AdminPolicy")]
+        public async Task<IActionResult> Delete(int id)
         {
-            var exist = await dbContext.Participaciones.AnyAsync(x => x.id == Id);
-
-            if (!exist)
+            var exist = await dbContext.Participaciones.AnyAsync(x => x.id == id);
+            if (!exist) return NotFound("No existe el registro.");
+            dbContext.Remove(new Rifa
             {
-                return NotFound("No existe esa participación en la lista");
-            }
-
-            dbContext.Remove(new Participaciones()
-            {
-                id = Id
+                id = id
             });
             await dbContext.SaveChangesAsync();
-            return Ok("Participación con id " + Id + " eliminada con éxito");
+            return NoContent();
         }
 
-        [Authorize(Policy = "AdminPolicy")]
+        /*
         [HttpDelete]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]
         //este pedo está mal pensado, piensa bien en qué valores tomas y necesitas
@@ -129,5 +125,6 @@ namespace RifaCasinoAPI.Controllers
             await dbContext.SaveChangesAsync();
             return Ok("Participación del Usuario " + IdUsuario + " en la rifa " + IdRifa + " eliminada con éxito");            
         }
+        */
     }
 }

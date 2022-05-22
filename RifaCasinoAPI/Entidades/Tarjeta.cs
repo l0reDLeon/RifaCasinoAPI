@@ -2,9 +2,9 @@
 {
     public class Tarjeta
     {
-        int id { get; set; }
-        string nombre { get; set; }
-        string refran { get; set; }
+        public int id { get; set; }
+        public string nombre { get; set; }
+        public string refran { get; set; }
 
         public Tarjeta(int id, string nombre, string refran)
         {

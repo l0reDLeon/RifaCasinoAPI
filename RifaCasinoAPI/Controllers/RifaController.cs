@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RifaCasinoAPI.DTOs;
 using Microsoft.AspNetCore.JsonPatch;
+using RifaCasinoAPI.Utilidades;
 
 namespace RifaCasinoAPI.Controllers
 {
@@ -28,13 +29,6 @@ namespace RifaCasinoAPI.Controllers
             this.config = conf;
         }
 
-        [AllowAnonymous]
-        [HttpGet("GetDePrueba")]
-        public IActionResult Get()
-        {
-            throw new NotImplementedException();
-            //return Ok("ListaDeRifas");
-        }
         [AllowAnonymous]
         [HttpGet("VerRifas")]
         //[ResponseCache(Duration = 30)]
@@ -188,6 +182,73 @@ namespace RifaCasinoAPI.Controllers
             });
             await dbContext.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpPut("ModificarRifa")]
+        [Authorize(Policy = "AdminPolicy")]
+        public async Task<ActionResult> Put(EditarRifaDTO rifaEditar)
+        {
+            var rifaDB = await dbContext.Rifas
+                .Include(rifa=>rifa.participaciones).Include(rifa=>rifa.premioList)
+                .FirstOrDefaultAsync(rifa => rifa.id == rifaEditar.id);
+            if(rifaDB == null)
+            {
+                return NotFound("No existe una rifa con ese id");
+            }
+            var rifaActualizar = mapper.Map(rifaEditar, rifaDB);
+
+            dbContext.Update(rifaActualizar);
+            await dbContext.SaveChangesAsync();
+            return Ok();
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //Función para obtener las cartas disponibles
+        [AllowAnonymous]
+        [HttpGet("Tarjetas")]
+        public async Task<ActionResult<List<Tarjeta>>> GetDisponibles(int idRifa)
+        {
+            var registros = await dbContext.Participaciones.Where(registro => registro.idRifa == idRifa).ToListAsync();
+            if (registros.Count == 0)
+            {
+                return NotFound("Esta rifa no tiene participantes");
+            }
+
+            List<int> ListaUsados = new List<int>();
+            foreach (var registro in registros)
+            {
+                ListaUsados.Add(registro.noLoteria);
+            }
+
+            TarjetasPreset Lista = new TarjetasPreset();
+            List<Tarjeta> Tarjetas = Lista.GetTarjetas();
+
+            List<int> TarjetasInt = new List<int>();
+            foreach (var tarjeta in Tarjetas)
+            {
+                TarjetasInt.Add(tarjeta.id);
+            }
+
+            List<Tarjeta> Disponibles = new List<Tarjeta>();
+            List<int> DisponiblesInt = new List<int>();
+
+            foreach(var noLoteria in TarjetasInt)
+            {
+                if (!ListaUsados.Contains(noLoteria)) {
+                    DisponiblesInt.Add(noLoteria);
+                }
+            }
+
+            foreach(var id in DisponiblesInt)
+            {
+                foreach(var tarjeta in Tarjetas)
+                {
+                    if(tarjeta.id == id)
+                        Disponibles.Add(tarjeta);
+                }
+            }
+            return Disponibles;
         }
     }
 }
