@@ -34,7 +34,9 @@ namespace RifaCasinoAPI.Utilidades
                 //PARTICIPACIONES
             CreateMap<ParticipacionesCreacionDTO, ParticipacionesDTO>();
             CreateMap<ParticipacionesDTO, Participaciones>().ReverseMap();
-            CreateMap<Participaciones, GetParticipacionesDTO>();
+            CreateMap<Participaciones, GetParticipacionesDTO>()
+                .ForMember(GPDTO => GPDTO.id, opciones => opciones.MapFrom(Part => Part.id))
+                .ForMember(GPDTO => GPDTO.idParticipante, opciones => opciones.MapFrom(Part => Part.id));
 
         }
         //TOKEN DE 1 AÑO: lore@gmail.com; aA123!   ADMIN 
@@ -77,19 +79,20 @@ namespace RifaCasinoAPI.Utilidades
             if (rifa.participaciones == null) return ListaGetParticipacionesDTO;
             foreach (Participaciones participacion in rifa.participaciones)
             {
-                // se intenta mapear de premio eventualmente a GetPremioDTO
-                var premioDTO = premioToGetPremioDTOParticipaciones(participacion);
-                ListaGetParticipacionesDTO.Add(premioDTO);
+                // se intenta mapear cada participacion a GetParticipacionesDTO
+                var GetparticipacionDTO = participacionTOGetParticipacionesDTO(participacion);
+                ListaGetParticipacionesDTO.Add(GetparticipacionDTO);
             }
             return ListaGetParticipacionesDTO;
         }
 
         //funcion que regresa todo el objeto, no solo una propiedad
-        private GetParticipacionesDTO premioToGetPremioDTOParticipaciones(Participaciones participacion)
+        private GetParticipacionesDTO participacionTOGetParticipacionesDTO(Participaciones participacion)
         {
             var getParticipacionesDTO = new GetParticipacionesDTO();
 
-            //getParticipacionesDTO.idParticipante =  participacion.idParticipante;
+            getParticipacionesDTO.id = participacion.id;
+            getParticipacionesDTO.idParticipante =  participacion.idParticipante;
             getParticipacionesDTO.idRifa = participacion.idRifa;
             getParticipacionesDTO.noLoteria = participacion.noLoteria;
             getParticipacionesDTO.ganador = participacion.ganador;

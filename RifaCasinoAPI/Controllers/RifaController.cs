@@ -31,7 +31,7 @@ namespace RifaCasinoAPI.Controllers
 
         [AllowAnonymous]
         [HttpGet("VerRifas")]
-        //[ResponseCache(Duration = 30)]
+        [ResponseCache(Duration = 30)]
         public async Task<ActionResult<List<GetRifaDTO>>> GetLista()
         {
             var Rifas = await dbContext.Rifas
@@ -202,7 +202,6 @@ namespace RifaCasinoAPI.Controllers
             return Ok();
         }
 
-
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //Función para obtener las cartas disponibles
         [AllowAnonymous]
@@ -250,5 +249,11 @@ namespace RifaCasinoAPI.Controllers
             }
             return Disponibles;
         }
-    }
+
+        [Authorize(Policy = "AdminPolicy")]
+        [HttpGet("ElegirGanador")]
+        public async Task<ActionResult<List<Tarjeta>>> GetDisponibles(int idRifa)
+        {
+
+        }
 }

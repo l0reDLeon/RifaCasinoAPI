@@ -96,7 +96,7 @@ namespace RifaCasinoAPI.Controllers
         {
             var exist = await dbContext.Participaciones.AnyAsync(x => x.id == id);
             if (!exist) return NotFound("No existe el registro.");
-            dbContext.Remove(new Rifa
+            dbContext.Remove(new Participaciones
             {
                 id = id
             });
