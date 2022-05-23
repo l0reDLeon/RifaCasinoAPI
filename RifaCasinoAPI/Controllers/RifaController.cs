@@ -120,7 +120,7 @@ namespace RifaCasinoAPI.Controllers
 
             if (crearPremioDTO == null) return BadRequest();
             var rifaDB = await dbContext.Rifas
-                .Include(rifa=>rifa.premioList)
+                .Include(rifa => rifa.premioList)
                 .FirstOrDefaultAsync(x => x.id == idRifa);
             if (rifaDB == null) return NotFound("No existe esa rifa");
 
@@ -189,9 +189,9 @@ namespace RifaCasinoAPI.Controllers
         public async Task<ActionResult> Put(EditarRifaDTO rifaEditar)
         {
             var rifaDB = await dbContext.Rifas
-                .Include(rifa=>rifa.participaciones).Include(rifa=>rifa.premioList)
+                .Include(rifa => rifa.participaciones).Include(rifa => rifa.premioList)
                 .FirstOrDefaultAsync(rifa => rifa.id == rifaEditar.id);
-            if(rifaDB == null)
+            if (rifaDB == null)
             {
                 return NotFound("No existe una rifa con ese id");
             }
@@ -232,18 +232,19 @@ namespace RifaCasinoAPI.Controllers
             List<Tarjeta> Disponibles = new List<Tarjeta>();
             List<int> DisponiblesInt = new List<int>();
 
-            foreach(var noLoteria in TarjetasInt)
+            foreach (var noLoteria in TarjetasInt)
             {
-                if (!ListaUsados.Contains(noLoteria)) {
+                if (!ListaUsados.Contains(noLoteria))
+                {
                     DisponiblesInt.Add(noLoteria);
                 }
             }
 
-            foreach(var id in DisponiblesInt)
+            foreach (var id in DisponiblesInt)
             {
-                foreach(var tarjeta in Tarjetas)
+                foreach (var tarjeta in Tarjetas)
                 {
-                    if(tarjeta.id == id)
+                    if (tarjeta.id == id)
                         Disponibles.Add(tarjeta);
                 }
             }
@@ -252,8 +253,37 @@ namespace RifaCasinoAPI.Controllers
 
         [Authorize(Policy = "AdminPolicy")]
         [HttpGet("ElegirGanador")]
-        public async Task<ActionResult<List<Tarjeta>>> GetDisponibles(int idRifa)
+        public async Task<ActionResult<WinnerCard>> Winner(int idRifa)
         {
+            var rifaDB = await dbContext.Rifas.Where(x => x.id == idRifa).FirstOrDefaultAsync();
+            if (rifaDB == null) return BadRequest();
+            var participaciones = await dbContext.Participaciones.Where(x => x.idRifa == idRifa).ToListAsync();
+            if (participaciones.Count() == 0) return BadRequest();
+            var premiosDB = await dbContext.Premios.Where(x => x.idRifa == idRifa && x.disponible == true).ToListAsync();
 
+            var random = new Random();
+            var ganador = participaciones.OrderBy(x => random.Next()).Take(1).FirstOrDefault();
+            var premioGanador = premiosDB.Last();
+            premioGanador.disponible = false;
+
+            dbContext.Premios.Update(premioGanador);
+
+            await dbContext.SaveChangesAsync();
+
+            var participante = await dbContext.Participantes.Where(x => x.idUser == ganador.idParticipante).FirstOrDefaultAsync();
+
+            TarjetasPreset Lista = new TarjetasPreset();
+            List<Tarjeta> Tarjetas = Lista.GetTarjetas();
+
+            Tarjeta winnerCard = Tarjetas[premioGanador.id];
+            GetPremioDTO premio = new GetPremioDTO();
+            premio.nombre = premioGanador.nombre;
+            premio.disponible = true;
+            premio.descripcion = premioGanador.descripcion;
+
+            WinnerCard winnerC = new WinnerCard(participante.email,idRifa, rifaDB.nombre,winnerCard, premio);
+
+            return winnerC;
         }
+    }
 }

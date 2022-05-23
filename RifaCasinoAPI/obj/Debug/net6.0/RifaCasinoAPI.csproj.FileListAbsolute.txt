@@ -86,3 +86,9 @@ C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\Microso
 C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\Newtonsoft.Json.dll
 C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
 C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\RifaCasinoAPI.staticwebassets.runtime.json
+C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\NPOI.OOXML.dll
+C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\NPOI.OpenXml4Net.dll
+C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\NPOI.OpenXmlFormats.dll
+C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\NPOI.dll
+C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+C:\Users\anton\source\repos\RifaCasinoAPI\RifaCasinoAPI\bin\Debug\net6.0\ICSharpCode.SharpZipLib.dll

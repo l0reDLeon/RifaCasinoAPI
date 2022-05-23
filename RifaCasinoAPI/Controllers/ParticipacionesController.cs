@@ -104,6 +104,8 @@ namespace RifaCasinoAPI.Controllers
             return NoContent();
         }
 
+
+
         /*
         [HttpDelete]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "AdminPolicy")]

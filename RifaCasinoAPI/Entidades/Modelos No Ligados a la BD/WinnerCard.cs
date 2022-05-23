@@ -4,16 +4,14 @@ namespace RifaCasinoAPI.Entidades
 {
     public class WinnerCard
     {
-        public string idUser { get; set; }
         public string email { get; set; }
         public int idRifa { get; set; }
         public string nombreRifa { get; set; }
         public Tarjeta winnerCard { get; set; }
         public GetPremioDTO premio { get; set; }
 
-        public WinnerCard(string idUser, string email, int idRifa, string nombreRifa, Tarjeta winnercard, GetPremioDTO premio)
+        public WinnerCard( string email, int idRifa, string nombreRifa, Tarjeta winnercard, GetPremioDTO premio)
         {
-            this.idUser = idUser;
             this.email = email;
             this.idRifa = idRifa;
             this.nombreRifa = nombreRifa;
